@@ -1,3 +1,4 @@
+#include <spdlog/spdlog.h>
 #include <wx/wx.h>
 #include <wx/clipbrd.h>
 #include <cstring>
@@ -220,7 +221,7 @@ void FriendsListFrame::OnGuestPanelClick(wxCommandEvent &event)
     if(dlg->ShowModal() == wxID_OK)
     {
         m_pRemoteInvite->SendInvite(CSteamID(0, k_EUniversePublic, k_EAccountTypeIndividual));
+        SPDLOG_INFO("Creating guest invite link for appID {}", GetRunningGameID().AppID());
     }
     delete dlg;
 }
-
