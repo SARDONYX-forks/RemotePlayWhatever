@@ -1,0 +1,54 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, reopened, synchronize]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+
+      matrix:
+        # os: [windows-latest, ubuntu-latest, macos-latest]
+        os: [windows-latest]
+        target: [RemotePlayWhatever, OpenSteamAPI]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: Setup MSVC & LLVM(Windows)
+        uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+        with:
+          arch: x64
+
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: "3.0.6"
+          actions-cache-key: ${{ runner.os }}-xmake
+          build-cache-key: ${{ runner.os }}-xmake-build-${{ matrix.target }}
+
+      - name: Build
+        shell: pwsh
+        run: xmake build -y
+
+      - name: Install
+        shell: pwsh
+        run: xmake install -o ./build/artifact ${{ matrix.target }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}-${{ matrix.os }}
+          path: ./build/artifact/bin/

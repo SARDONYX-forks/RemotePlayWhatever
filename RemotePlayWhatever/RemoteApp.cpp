@@ -1,7 +1,10 @@
 #include <wx/cmdline.h>
 #include <wx/utils.h>
 #include "RemoteApp.h"
-#include "wxSteamStuff.h"
+
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
+
 #include "FriendsListFrame.h"
 
 static const wxCmdLineEntryDesc cmdLineDesc[] =
@@ -26,6 +29,12 @@ RemoteApp::RemoteApp():
 
 bool RemoteApp::OnInit()
 {
+    auto logger = spdlog::basic_logger_mt("rpw", "RemotePlayWhatever.log");
+    logger->set_level(spdlog::level::trace);
+    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%s:%#] %v"); // NOTE: Use macros such as `SPDLOG_INFO`!
+    spdlog::set_default_logger(logger);
+    spdlog::flush_on(spdlog::level::trace);
+
     if (!wxApp::OnInit())
         return false;
 
@@ -163,5 +172,3 @@ void RemoteAppCallbackRunner::Notify()
 {
     GClientContext()->RunCallbacks();
 }
-
-
