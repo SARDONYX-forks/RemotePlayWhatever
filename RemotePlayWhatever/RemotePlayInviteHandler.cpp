@@ -1,3 +1,5 @@
+#include <spdlog/spdlog.h>
+
 #include "SteamStuff.h"
 #include "RemotePlayInviteHandler.h"
 
@@ -22,6 +24,7 @@ void RemotePlayInviteHandler::SendInvite(CSteamID invitee)
 
     if (!gameID.IsValid())
     {
+        SPDLOG_ERROR("No game running, cannot send invite");
         return;
     }
 
@@ -30,7 +33,11 @@ void RemotePlayInviteHandler::SendInvite(CSteamID invitee)
 
     if (gameID.IsSteamApp() && gameID.AppID() != m_nonsteamAppID)
     {
-        GClientContext()->RemoteClientManager()->BCreateRemotePlayInviteAndSession(rppInvitee, gameID.AppID());
+        auto result = GClientContext()->RemoteClientManager()->BCreateRemotePlayInviteAndSession(rppInvitee, gameID.AppID());
+        if (!result)
+        {
+            SPDLOG_ERROR("Failed to send invite for steam game appID {}", gameID.AppID());
+        }
     }
     else
     {

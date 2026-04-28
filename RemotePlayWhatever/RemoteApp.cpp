@@ -1,7 +1,13 @@
+#include <wx/sysopt.h>
 #include <wx/cmdline.h>
 #include <wx/utils.h>
 #include "RemoteApp.h"
-#include "wxSteamStuff.h"
+
+#ifdef _DEBUG
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#endif
+
 #include "FriendsListFrame.h"
 
 static const wxCmdLineEntryDesc cmdLineDesc[] =
@@ -22,10 +28,20 @@ RemoteApp::RemoteApp():
     m_nonSteamID(0),
     m_inviteToCancel(-1)
 {
+    wxSystemOptions::SetOption("msw.no-manifest-check", 1);
 }
 
 bool RemoteApp::OnInit()
 {
+#ifdef _DEBUG
+    auto logger = spdlog::basic_logger_mt("rpw", "RemotePlayWhatever.log");
+    logger->set_level(spdlog::level::trace);
+    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%s:%#] %v"); // NOTE: Use macros such as `SPDLOG_INFO`!
+    spdlog::set_default_logger(logger);
+    spdlog::flush_on(spdlog::level::trace);
+#endif
+    MSWEnableDarkMode();
+
     if (!wxApp::OnInit())
         return false;
 
@@ -163,5 +179,3 @@ void RemoteAppCallbackRunner::Notify()
 {
     GClientContext()->RunCallbacks();
 }
-
-
