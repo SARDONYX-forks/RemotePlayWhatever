@@ -1,3 +1,6 @@
 [submodule "open-steamworks"]
 	path = open-steamworks
 	url = https://github.com/m4dEngi/open-steamworks.git
+[submodule "third_party/wxwidgets"]
+	path = third_party/wxwidgets
+	url = https://github.com/wxWidgets/wxWidgets.git

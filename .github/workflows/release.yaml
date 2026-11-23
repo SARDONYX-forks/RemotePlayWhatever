@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6.0.1
+        with:
+          submodules: "recursive"
+
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: "3.0.6"
+          actions-cache-folder: ".xmake-cache"
+          actions-cache-key: ${{ runner.os }}-xmake-release-cache-
+
+      - name: Build
+        run: xmake build -y
+      - name: Install
+        run: xmake install -o ./build/artifact RemotePlayWhatever
+
+      - name: Package artifact
+        shell: pwsh
+        run: |
+          $name = "RemotePlayWhatever"
+          Compress-Archive -Path ./build/artifact/* -DestinationPath "$name-windows.zip"
+
+      - name: Create GitHub Release (gh)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create `
+            "${{ github.ref_name }}" `
+            "RemotePlayWhatever-windows.zip" `
+            --title "RemotePlayWhatever ${{ github.ref_name }}" `
+            --generate-notes
