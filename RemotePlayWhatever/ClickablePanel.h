@@ -18,6 +18,9 @@ protected:
     void OnMouseLeftDown(wxMouseEvent& event);
     void OnMouseLeftUp(wxMouseEvent& event);
 
+    // Text colour when the panel isn't highlighted.
+    virtual wxColour NormalForeground() const;
+
 private:
     void RSetForegroundColour(const wxColour &colour);
     void RSetBackgroundColour(const wxColour &colour);

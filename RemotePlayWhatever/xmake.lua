@@ -1,13 +1,13 @@
-local OSW_ROOT    = path.join(os.scriptdir(), "../open-steamworks")
+local OSW_ROOT = path.join(os.scriptdir(), "../open-steamworks")
 local OSW_INCLUDE = path.join(OSW_ROOT, "OpenSteamworks")
-local OSW_SRC     = path.join(OSW_ROOT, "OpenSteamAPI/src")
+local OSW_SRC = path.join(OSW_ROOT, "OpenSteamAPI/src")
 
-target("OpenSteamAPI", function()
+target("OpenSteamAPI", function ()
     set_kind("shared")
-    add_includedirs(OSW_INCLUDE, OSW_SRC, { public = true })
+    add_includedirs(OSW_INCLUDE, OSW_SRC, {public = true})
     add_defines("STEAM_API_EXPORTS", "STEAMWORKS_CLIENT_INTERFACES")
 
-	set_pcxxheader(path.join(OSW_INCLUDE, "SteamClient.h")) -- Precompiled header
+    set_pcxxheader(path.join(OSW_INCLUDE, "SteamClient.h")) -- Precompiled header
     add_files(
         path.join(OSW_SRC, "CCallbackMgr.cpp"),
         path.join(OSW_SRC, "ClientWrap.cpp"),
@@ -29,7 +29,7 @@ target("OpenSteamAPI", function()
     end
 end)
 
-package("wxwidgets_static", function()
+package("wxwidgets_static", function ()
     add_deps("cmake")
     set_sourcedir(path.join(os.projectdir(), "third_party/wxwidgets"))
 
@@ -72,7 +72,7 @@ end)
 add_requires("wxwidgets_static")
 add_requires("spdlog", {configs = {header_only = true}})
 
-target("RemotePlayWhatever", function()
+target("RemotePlayWhatever", function ()
     set_kind("binary")
     add_deps("OpenSteamAPI")
     add_defines("STEAMWORKS_CLIENT_INTERFACES")
@@ -86,7 +86,7 @@ target("RemotePlayWhatever", function()
     elseif is_os("linux") then
         set_basename("remoteplaywhatever")
         add_syslinks("dl")
-        on_install(function(target)
+        on_install(function (target)
             os.cp(target:targetfile(), "/usr/bin/remoteplaywhatever")
         end)
     elseif is_os("macosx") then
